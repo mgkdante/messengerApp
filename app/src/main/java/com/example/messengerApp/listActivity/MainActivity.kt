@@ -1,4 +1,4 @@
-package com.example.messengerApp
+package com.example.messengerApp.listActivity
 
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
@@ -7,12 +7,14 @@ import android.provider.ContactsContract
 import androidx.core.app.ActivityCompat
 import android.Manifest
 import android.content.Intent
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.*
+import com.example.messengerApp.R
+import com.example.messengerApp.chatActivity.ChatActivity
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var searchView: SearchView
 
     private val cols = listOf(
         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
@@ -25,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(findViewById(R.id.toolbar2))
+        this.searchView = findViewById(R.id.search)
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -40,6 +43,7 @@ class MainActivity : AppCompatActivity() {
             readContact()
     }
 
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -49,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == 111 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             readContact()
     }
+
 
     private fun readContact() {
 
@@ -73,9 +78,8 @@ class MainActivity : AppCompatActivity() {
 
         listView.adapter = adapter
 
-       val searchView: SearchView = findViewById(R.id.search)
 
-       searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        this.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 return false
             }
