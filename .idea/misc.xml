@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.21875" />
+        <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable/custom_shape.xml" value="0.21875" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable/customshape.xml" value="0.21458333333333332" />
+        <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.21875" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable/ic_search.xml" value="0.21458333333333332" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable/user1.xml" value="0.21458333333333332" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/drawable/user2.xml" value="0.21458333333333332" />
@@ -18,6 +21,7 @@
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/layout/user2_message.xml" value="0.1984375" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/menu/menu_search.xml" value="0.3625" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/menu/options_menu.xml" value="0.1984375" />
+        <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.21458333333333332" />
         <entry key="..\:/Users/Otalo/AndroidStudioProjects/MessengerApp/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.21458333333333332" />
       </map>
     </option>

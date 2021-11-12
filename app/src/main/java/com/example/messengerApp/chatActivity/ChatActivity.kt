@@ -1,7 +1,10 @@
 package com.example.messengerApp.chatActivity
 
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -16,7 +19,11 @@ class ChatActivity : AppCompatActivity() {
     private val data = mutableListOf<MessageItemUi>()
     private val adapter = ChatAdapter(data)
     private lateinit var textView: TextView
+    private lateinit var button2: Button
     private lateinit var button: Button
+    private val pickImage = 100
+    private var imageUri: Uri? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +38,7 @@ class ChatActivity : AppCompatActivity() {
             text = number
         }
 
-        button = findViewById(R.id.button2)
+        button2 = findViewById(R.id.button2)
 
         textView = findViewById(R.id.input_message)
 
@@ -42,13 +49,26 @@ class ChatActivity : AppCompatActivity() {
         }
 
 
-        button.setOnClickListener{
+        button = findViewById(R.id.button)
+        button.setOnClickListener {
+            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            startActivityForResult(gallery, pickImage)
+        }
+
+
+        button2.setOnClickListener{
             insertItem()
             textView.text = ""
             recyclerView.scrollToPosition(0)
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            imageUri = data?.data
+        }
+    }
 
     private fun insertItem(){
         val newItem: MessageItemUi = MessageItemUi(textView.text.toString(),
