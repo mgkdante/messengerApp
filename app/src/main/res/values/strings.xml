@@ -21,4 +21,26 @@
     <string name="button">Button</string>
     <string name="send">Send</string>
     <string name="plus">+</string>
+    <string name="imagemessage">ImageMessage</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="app_logo">app_logo</string>
+    <string name="log_in">Log In</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">sign up</string>
+    <string name="email">Email</string>
+    <string name="register">Register</string>
+    <string name="reset">Reset</string>
+    <string name="sign_out">Sign out</string>
+    <string name="password_reset">Password reset</string>
+    <string name="googlelogin">GoogleLogIn</string>
 </resources>

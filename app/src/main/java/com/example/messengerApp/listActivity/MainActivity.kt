@@ -9,12 +9,17 @@ import android.Manifest
 import android.content.Intent
 import android.widget.*
 import com.example.messengerApp.R
+import com.example.messengerApp.authenticationActivity.LogInActivity
 import com.example.messengerApp.chatActivity.ChatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var searchView: SearchView
+    private lateinit var signOut: Button
 
     private val cols = listOf(
         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
@@ -28,6 +33,14 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.toolbar2))
         this.searchView = findViewById(R.id.search)
+
+        signOut = findViewById(R.id.sign_out)
+
+        signOut.setOnClickListener {
+            Firebase.auth.signOut()
+            val intent = Intent(this, LogInActivity::class.java)
+            startActivity(intent)
+        }
 
         if (ActivityCompat.checkSelfPermission(
                 this,

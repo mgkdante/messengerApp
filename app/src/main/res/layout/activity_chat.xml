@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:background="#000000"
     tools:context=".chatActivity.ChatActivity">
 
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/app_bar"
+        android:id="@+id/app_bar_log_in"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple_500"
+        android:background="#6a0080"
         android:minHeight="?attr/actionBarSize"
         android:text="@string/hello"
         android:theme="?attr/actionBarTheme"
@@ -27,19 +27,18 @@
         android:layout_height="wrap_content"
         android:text="@string/text_view2"
         android:textColor="#E1BEE7"
-        app:layout_constraintBottom_toBottomOf="@+id/app_bar"
-        app:layout_constraintEnd_toEndOf="@id/app_bar"
+        app:layout_constraintBottom_toBottomOf="@+id/app_bar_log_in"
+        app:layout_constraintEnd_toEndOf="@id/app_bar_log_in"
         app:layout_constraintHorizontal_bias="0.813"
-        app:layout_constraintStart_toStartOf="@id/app_bar"
-        app:layout_constraintTop_toTopOf="@+id/app_bar"
+        app:layout_constraintStart_toStartOf="@id/app_bar_log_in"
+        app:layout_constraintTop_toTopOf="@+id/app_bar_log_in"
         app:layout_constraintVertical_bias="0.5" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
-        android:layout_width="0dp"
+        android:layout_width="310dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
-        android:layout_marginLeft="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button2"
         app:layout_constraintStart_toStartOf="@id/button">
@@ -61,30 +60,31 @@
         app:layout_constraintBottom_toTopOf="@+id/textInputLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_log_in" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="75dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/send"
+        android:background="@android:drawable/ic_menu_send"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textInputLayout"
         app:layout_constraintTop_toBottomOf="@+id/message"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintVertical_bias="0.5"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="1dp"
-        android:layout_marginRight="1dp"
-        android:text="@string/plus"
+        android:background="@android:drawable/ic_menu_gallery"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textInputLayout"
         app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textInputLayout" />
+        app:layout_constraintTop_toTopOf="@+id/textInputLayout"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,6 @@
 package com.example.messengerApp.chatActivity
 
 import android.content.Intent
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,11 +8,12 @@ import android.provider.MediaStore
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messengerApp.R
-import android.os.Build
-import androidx.core.content.ContentProviderCompat.requireContext
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 
 class ChatActivity : AppCompatActivity() {
@@ -27,15 +24,18 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var button: Button
     private val pickImage = 100
     private var imageUri: Uri? = null
-    private lateinit var bitmap: Bitmap
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
-        setSupportActionBar(findViewById(R.id.app_bar))
+        setSupportActionBar(findViewById(R.id.app_bar_log_in))
+
+        val db = Firebase.firestore
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true);
         supportActionBar?.setDisplayShowHomeEnabled(true);
+
+
         val name = intent.getStringExtra("name")
         val number = intent.getStringExtra("number")
         title = name
@@ -59,8 +59,13 @@ class ChatActivity : AppCompatActivity() {
         }
         button2.setOnClickListener{
             insertItem()
+            val docData = hashMapOf("Content" to textView.text.toString())
+            if (name != null) {
+                db.collection(name).add(docData)
+            }
             textView.text = ""
             recyclerView.scrollToPosition(0)
+            imageUri = null
         }
     }
     private fun selectImage(){
@@ -72,26 +77,22 @@ class ChatActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data
-            bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, imageUri!!))
-            } else {
-                MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-            }
         }
-        imageToText()
-    }
-
-    private fun imageToText(){
-        val drawable = BitmapDrawable(resources, bitmap)
-        val h = drawable.intrinsicHeight
-        val w = drawable.intrinsicWidth
-        drawable.setBounds(0, 0, w, h)
-        textView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
+        Toast.makeText(this, "Image Loaded", Toast.LENGTH_SHORT).show()
     }
 
     private fun insertItem(){
-        val newItem: MessageItemUi = MessageItemUi(textView.text.toString(),
-            0)
+        val newItem: MessageItemUi = if (imageUri == null) {
+            MessageItemUi(
+                textView.text.toString(),
+                null, 0
+            )
+        } else {
+            MessageItemUi(
+                textView.text.toString(),
+                imageUri, 0
+            )
+        }
         data.add(0,newItem)
         adapter.notifyItemInserted(0)
     }
