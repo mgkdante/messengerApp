@@ -102,6 +102,8 @@ class LogInActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
+
+    //NEED TO CORRECT GOOGLE SIGN IN
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, 1)
