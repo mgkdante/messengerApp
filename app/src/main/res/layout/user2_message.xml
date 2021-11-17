@@ -9,12 +9,27 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/image_user_two"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/user2"
+        android:contentDescription="@string/imagemessage"
+        android:maxWidth="150dp"
+        android:padding="10dp"
+        android:scaleType="fitXY"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/message_user_two" />
+
     <TextView
         android:id="@+id/message_user_two"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/user2"
-        android:padding="16dp"
+        android:padding="15dp"
         android:textColor="#000000"
         android:textSize="16sp"
         app:layout_constrainedWidth="true"

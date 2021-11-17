@@ -1,7 +1,10 @@
 package com.example.messengerApp.chatActivity
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,8 +15,12 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.messengerApp.R
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
+import java.io.ByteArrayOutputStream
 
 
 class ChatActivity : AppCompatActivity() {
@@ -24,19 +31,25 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var button: Button
     private val pickImage = 100
     private var imageUri: Uri? = null
+    private lateinit var imageStorage: FirebaseStorage
+    private var imageBitMap: Bitmap? = null
+    private var name: String? = null
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         setSupportActionBar(findViewById(R.id.app_bar_log_in))
 
-        val db = Firebase.firestore
+        db = Firebase.firestore
+
+        imageStorage = Firebase.storage
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true);
         supportActionBar?.setDisplayShowHomeEnabled(true);
 
 
-        val name = intent.getStringExtra("name")
+        name = intent.getStringExtra("name")
         val number = intent.getStringExtra("number")
         title = name
         val textView2 = findViewById<TextView>(R.id.text_view2).apply {
@@ -60,12 +73,13 @@ class ChatActivity : AppCompatActivity() {
         button2.setOnClickListener{
             insertItem()
             val docData = hashMapOf("Content" to textView.text.toString())
-            if (name != null) {
-                db.collection(name).add(docData)
-            }
+            val newRef = db.collection("chat").document()
+            newRef.set(docData)
+            upLoadImages()
             textView.text = ""
             recyclerView.scrollToPosition(0)
             imageUri = null
+            imageBitMap = null
         }
     }
     private fun selectImage(){
@@ -77,8 +91,41 @@ class ChatActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data
+            try {
+                imageUri?.let {
+                    if(Build.VERSION.SDK_INT < 28) {
+                        imageBitMap = MediaStore.Images.Media.getBitmap(
+                            this.contentResolver,
+                            imageUri
+                        )
+                        //imageView.setImageBitmap(bitmap)
+                    } else {
+                        val source = ImageDecoder.createSource(this.contentResolver, imageUri!!)
+                        imageBitMap = ImageDecoder.decodeBitmap(source)
+                        //imageView.setImageBitmap(bitmap)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         Toast.makeText(this, "Image Loaded", Toast.LENGTH_SHORT).show()
+    }
+
+
+    private fun upLoadImages(){
+        val storageRef = imageStorage.reference
+        val mountainsRef = storageRef.child("message")
+        val baos = ByteArrayOutputStream()
+        imageBitMap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+        val uploadTask = mountainsRef.putBytes(data)
+        uploadTask.addOnFailureListener {
+            Toast.makeText(this, "Failed to upload", Toast.LENGTH_SHORT).show()
+        }.addOnSuccessListener { taskSnapshot ->
+            taskSnapshot.metadata
+        }
+
     }
 
     private fun insertItem(){
