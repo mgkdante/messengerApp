@@ -11,10 +11,14 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.messengerApp.R
 import com.example.messengerApp.listActivity.MainActivity
+import com.facebook.*
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -29,8 +33,8 @@ class LogInActivity : AppCompatActivity() {
     private lateinit var reset: Button
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var googleButton: ImageButton
-
-
+    private lateinit var buttonFacebookLogin: LoginButton
+    private lateinit var callbackManager: CallbackManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +50,12 @@ class LogInActivity : AppCompatActivity() {
         register = findViewById(R.id.sign_up)
         reset = findViewById(R.id.reset)
         googleButton = findViewById(R.id.googlesignin)
+        buttonFacebookLogin = findViewById(R.id.login_button)
 
         setUpGoogle()
+        setUpFacebook()
+
+        googleButton.setImageResource(R.drawable.ic_google__g__logo__1_)
 
         logIn.setOnClickListener {
             signIn(email.text.toString(), password.text.toString())
@@ -64,9 +72,8 @@ class LogInActivity : AppCompatActivity() {
         }
 
         googleButton.setOnClickListener {
-            signIn()
+            signInG()
         }
-
     }
 
     public override fun onStart() {
@@ -94,6 +101,42 @@ class LogInActivity : AppCompatActivity() {
             }
     }
 
+    private fun handleFacebookAccessToken(token: AccessToken) {
+        Log.d(TAG, "handleFacebookAccessToken:$token")
+        val credential = FacebookAuthProvider.getCredential(token.token)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    Toast.makeText(baseContext, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+        // ...
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+
+            if (requestCode == 1) {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+                try {
+                    // Google Sign In was successful, authenticate with Firebase
+                    val account = task.getResult(ApiException::class.java)!!
+                    Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
+                    firebaseAuthWithGoogle(account.idToken!!)
+                } catch (e: ApiException) {
+                    // Google Sign In failed, update UI appropriately
+                    Log.w(TAG, "Google sign in failed", e)
+                }
+            }
+
+            callbackManager.onActivityResult(requestCode, resultCode, data)
+
+        }
+
     private fun setUpGoogle(){
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("103632168910-uskgfep8ht1lgfmf31l97l89a6d9qtjf.apps.googleusercontent.com")
@@ -102,30 +145,34 @@ class LogInActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
+    private fun setUpFacebook(){
+        callbackManager = CallbackManager.Factory.create()
+
+        buttonFacebookLogin.setReadPermissions("email", "public_profile")
+        buttonFacebookLogin.registerCallback(
+            callbackManager,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
+                    Log.d(TAG, "facebook:onSuccess:$loginResult")
+                    handleFacebookAccessToken(loginResult.accessToken)
+                }
+
+                override fun onCancel() {
+                    Log.d(TAG, "facebook:onCancel")
+                }
+
+                override fun onError(error: FacebookException) {
+                    Log.d(TAG, "facebook:onError", error)
+                }
+            })
+    }
 
     //NEED TO CORRECT GOOGLE SIGN IN
-    private fun signIn() {
+    private fun signInG() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, 1)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == 1) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                firebaseAuthWithGoogle(account.idToken!!)
-            } catch (e: ApiException) {
-                // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed", e)
-            }
-        }
-    }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)

@@ -43,4 +43,6 @@
     <string name="sign_out">Sign out</string>
     <string name="password_reset">Password reset</string>
     <string name="googlelogin">GoogleLogIn</string>
+    <string name="facebook_app_id">609588533518320</string>
+
 </resources>
