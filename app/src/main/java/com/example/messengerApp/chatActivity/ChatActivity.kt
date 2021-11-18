@@ -73,7 +73,7 @@ class ChatActivity : AppCompatActivity() {
         button2.setOnClickListener{
             insertItem()
             val docData = hashMapOf("Content" to textView.text.toString())
-            val newRef = db.collection("chat").document()
+            val newRef = db.collection("chat").document("new-chat-id")
             newRef.set(docData)
             upLoadImages()
             textView.text = ""
@@ -88,7 +88,11 @@ class ChatActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(
+            requestCode,
+            resultCode,
+            data
+        )
         if (resultCode == RESULT_OK && requestCode == pickImage) {
             imageUri = data?.data
             try {

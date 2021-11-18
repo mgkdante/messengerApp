@@ -15,6 +15,7 @@ import com.facebook.*
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -52,10 +53,10 @@ class LogInActivity : AppCompatActivity() {
         googleButton = findViewById(R.id.googlesignin)
         buttonFacebookLogin = findViewById(R.id.login_button)
 
+        googleButton.setImageResource(R.drawable.ic_google__g__logo__1_)
+
         setUpGoogle()
         setUpFacebook()
-
-        googleButton.setImageResource(R.drawable.ic_google__g__logo__1_)
 
         logIn.setOnClickListener {
             signIn(email.text.toString(), password.text.toString())
@@ -76,6 +77,7 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+
     public override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
@@ -85,12 +87,30 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 1) {
+            val task = getSignedInAccountFromIntent(data)
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                val account = task.getResult(ApiException::class.java)!!
+                Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
+                firebaseAuthWithGoogle(account.idToken)
+            } catch (e: ApiException) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e)
+            }
+        }
+
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+
+    }
+
     private fun signIn(email: String, password: String){
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "signInWithEmail:success")
-                    val user = auth.currentUser
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                 } else {
@@ -101,50 +121,6 @@ class LogInActivity : AppCompatActivity() {
             }
     }
 
-    private fun handleFacebookAccessToken(token: AccessToken) {
-        Log.d(TAG, "handleFacebookAccessToken:$token")
-        val credential = FacebookAuthProvider.getCredential(token.token)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-        // ...
-        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-            super.onActivityResult(requestCode, resultCode, data)
-
-            if (requestCode == 1) {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-                try {
-                    // Google Sign In was successful, authenticate with Firebase
-                    val account = task.getResult(ApiException::class.java)!!
-                    Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-                    firebaseAuthWithGoogle(account.idToken!!)
-                } catch (e: ApiException) {
-                    // Google Sign In failed, update UI appropriately
-                    Log.w(TAG, "Google sign in failed", e)
-                }
-            }
-
-            callbackManager.onActivityResult(requestCode, resultCode, data)
-
-        }
-
-    private fun setUpGoogle(){
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("103632168910-uskgfep8ht1lgfmf31l97l89a6d9qtjf.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-    }
-
     private fun setUpFacebook(){
         callbackManager = CallbackManager.Factory.create()
 
@@ -152,9 +128,9 @@ class LogInActivity : AppCompatActivity() {
         buttonFacebookLogin.registerCallback(
             callbackManager,
             object : FacebookCallback<LoginResult> {
-                override fun onSuccess(loginResult: LoginResult) {
-                    Log.d(TAG, "facebook:onSuccess:$loginResult")
-                    handleFacebookAccessToken(loginResult.accessToken)
+                override fun onSuccess(result: LoginResult) {
+                    Log.d(TAG, "facebook:onSuccess:$result")
+                    handleFacebookAccessToken(result.accessToken)
                 }
 
                 override fun onCancel() {
@@ -167,6 +143,35 @@ class LogInActivity : AppCompatActivity() {
             })
     }
 
+    private fun handleFacebookAccessToken(token: AccessToken?) {
+        Log.d(TAG, "handleFacebookAccessToken:$token")
+        val credential = token?.let { FacebookAuthProvider.getCredential(it.token) }
+        if (credential != null) {
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        Log.w(TAG, "signInWithCredential:failure", task.exception)
+                        Toast.makeText(baseContext, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
+    }
+        // ...
+
+
+    private fun setUpGoogle(){
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("103632168910-uskgfep8ht1lgfmf31l97l89a6d9qtjf.apps.googleusercontent.com")    //"103632168910-uskgfep8ht1lgfmf31l97l89a6d9qtjf.apps.googleusercontent.com"
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+    }
+
+
     //NEED TO CORRECT GOOGLE SIGN IN
     private fun signInG() {
         val signInIntent = googleSignInClient.signInIntent
@@ -174,7 +179,7 @@ class LogInActivity : AppCompatActivity() {
     }
 
 
-    private fun firebaseAuthWithGoogle(idToken: String) {
+    private fun firebaseAuthWithGoogle(idToken: String?) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
@@ -182,9 +187,9 @@ class LogInActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
-                } else {
-                    onRestart()
-                }
+                }// else {
+
+                //}
             }
     }
 
