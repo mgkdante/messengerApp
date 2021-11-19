@@ -73,7 +73,7 @@ class ChatActivity : AppCompatActivity() {
         button2.setOnClickListener{
             insertItem()
             val docData = hashMapOf("Content" to textView.text.toString())
-            val newRef = db.collection("chat").document("new-chat-id")
+            val newRef = db.collection("chat").document()
             newRef.set(docData)
             upLoadImages()
             textView.text = ""
